@@ -1,6 +1,6 @@
 var express = require('express');
 var router = express.Router();
-const validateToken = require('../authentication/validateToken');
+const jwt = require('jsonwebtoken');
 
 /* GET home page. */
 router.post('/', function(req, res, next) {
@@ -15,9 +15,9 @@ router.post('/', function(req, res, next) {
     if(token == null){
         return res.sendStatus(401);
     }
+
     jwt.verify(token,process.env.SECRET,(err,user)=>{
         if(err) return res.sendStatus(401);
-        console.log(user);
         res.json(user);
     })
 });

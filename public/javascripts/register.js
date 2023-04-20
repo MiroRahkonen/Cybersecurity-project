@@ -14,16 +14,34 @@ registerForm.addEventListener('submit',async (event)=>{
     }
     
     if(response.status === 200){
-        return window.location.href='/login';
+        M.toast({html: 'Registration successful, redirecting to login page'});
+        setTimeout(()=>{
+            window.location.href='/login';
+        },2500);
     }
 })
 
 //Redirect to index page if already logged in
-function checkToken(){
-    const authToken = localStorage.getItem('auth_token');
+async function checkAuthToken(){
+    authToken = localStorage.getItem('auth_token');
     if(authToken){
-        window.location.href = '/';
+        let response = await fetch('/authenticate',{
+            method: 'POST',
+            headers: {
+                'authorization': 'Bearer ' + authToken
+            }
+        })
+        data = await response.json();
+        // Checking if a stored authToken is expired, deleting it and reloading
+        if(response.status !== 200){
+            localStorage.removeItem('auth_token');
+            window.location.reload();
+        }
+        // User is already logged in, redirect to index
+        else if(response.status === 200){
+            window.location.href = '/';
+        }
     }
 }
 
-checkToken();
+checkAuthToken();

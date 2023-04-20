@@ -1,6 +1,5 @@
 require('dotenv').config();
 const jwt = require('jsonwebtoken');
-const validateToken = require('../authentication/validateToken');
 var express = require('express');
 var router = express.Router();
 const bcrypt = require('bcryptjs');
@@ -16,9 +15,8 @@ router.get('/',(req,res,next)=>{
 
 router.post('/', upload.none(), async (req,res,next)=>{
     let user = await Users.findOne({username: req.body.username});
-    
     if(!user){
-        return res.status(403).json({message: "Couldn't find an account with provided username"});
+        return res.status(403).json({message: 'Please enter correct username/password'});
     }
     bcrypt.compare(req.body.password,user.password,(err,success)=>{
         if(err) throw err;
@@ -34,12 +32,12 @@ router.post('/', upload.none(), async (req,res,next)=>{
                 },
                 (err,token)=>{
                     if(err) throw err;
-                    return res.json({success: true, token})
+                    return res.json({success: true, user, token})
                 }
             )
         }
         else{
-            return res.status(400).json({message: 'Password incorrect'});
+            return res.status(400).json({message: 'Please enter correct username/password'});
         }
     })
 })

@@ -1,15 +1,35 @@
-let currentUsername = '';
+const welcomeMessage = document.getElementById('welcome-message');
 
-async function checkToken()
-    const authToken = localStorage.getItem('auth_token');
+let user;
+
+async function checkAuthToken(){
+    authToken = localStorage.getItem('auth_token');
     if(authToken){
-        let response = await fetch('/token/authenticate',{
+        let response = await fetch('/authenticate',{
+            method: 'POST',
             headers: {
                 'authorization': 'Bearer ' + authToken
             }
         })
         data = await response.json();
-        currentUsername = data.username;
+        user = data;
+
+        // If token check failed due to it being expired, remove token and reload
+        if(response.status !== 200){
+            localStorage.removeItem('auth_token');
+            window.location.reload();
+        }
+    }
+    initializeMessage();
 }
 
-checkToken();
+function initializeMessage(){
+    if(user){
+        welcomeMessage.innerHTML = `Welcome to the forum ${user.username}!`
+    }
+    else{
+        welcomeMessage.innerHTML = 'Welcome to the forum! \nTo create posts and comments, please log in.'
+    }
+}
+
+checkAuthToken();
