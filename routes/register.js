@@ -38,17 +38,12 @@ router.post('/',upload.none(),
         bcrypt.hash(req.body.password,10,(err,hash)=>{
             if(err) throw err;
             const encryptedPassword = hash;
-            Users.create(
-                {
-                    username: req.body.username,
-                    email: req.body.email,
-                    password: encryptedPassword
-                },
-                (err)=>{
-                    if(err) throw err;
-                    return res.status(200).json({message: 'User created'});
-                }
-            )
+            Users.create({
+                username: req.body.username,
+                email: req.body.email,
+                password: encryptedPassword
+            })
+            return res.status(200).json({message: 'User created'});
         });
 })
 
